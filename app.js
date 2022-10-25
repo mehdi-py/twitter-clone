@@ -4,7 +4,7 @@ const middleware = require("./middleware")
 const loginRoute = require("./routes/loginRoute")
 const registerRoute = require("./routes/registerRoute")
 const bodyParser = require("body-parser")
-
+const connectDB = require("./config/db")
 const app = express()
 const PORT = 3001
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -12,6 +12,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.listen(PORT, () => {
   console.log(`app is rinning on port ${PORT}`)
 })
+
+connectDB()
 
 app.set("view engine", "pug")
 app.set("views", "views")

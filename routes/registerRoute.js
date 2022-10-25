@@ -1,7 +1,8 @@
 const express = require("express")
-
 const app = express()
 const router = express.Router()
+
+const User = require("../models/userModel")
 
 app.set("view engine", "pug")
 app.set("views", "views")
@@ -9,7 +10,7 @@ app.set("views", "views")
 router.get("/", (req, res, next) => {
   res.status(200).render("register")
 })
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
   const firstName = req.body.firstName.trim()
   const lastName = req.body.lastName.trim()
   const username = req.body.username.trim()
@@ -19,6 +20,23 @@ router.post("/", (req, res, next) => {
   const payload = req.body
 
   if (firstName && lastName && username && email && password) {
+    try {
+      const user = await User.findOne({
+        $or: [{ username: username }, { password: password }],
+      })
+      if (!user) {
+        await User.create({ firstName, lastName, username, email, password })
+        payload.errorMessage = "Registered successfully."
+        res.status(200).render("register", payload)
+      } else {
+        payload.errorMessage = "This user already exist"
+        res.status(200).render("register", payload)
+      }
+    } catch {
+      console.log("an error happened")
+      payload.errorMessage = "Some Error Happend."
+      res.status(200).render("register", payload)
+    }
   } else {
     payload.errorMessage = "Make sure all fields have value"
 
