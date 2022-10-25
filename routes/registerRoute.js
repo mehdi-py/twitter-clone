@@ -25,9 +25,16 @@ router.post("/", async (req, res, next) => {
         $or: [{ username: username }, { password: password }],
       })
       if (!user) {
-        await User.create({ firstName, lastName, username, email, password })
+        const newUser = await User.create({
+          firstName,
+          lastName,
+          username,
+          email,
+          password,
+        })
         payload.errorMessage = "Registered successfully."
-        res.status(200).render("register", payload)
+        req.session.user = newUser
+        return res.redirect("/")
       } else {
         payload.errorMessage = "This user already exist"
         res.status(200).render("register", payload)
